@@ -1,6 +1,7 @@
 package jeopardy;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,9 @@ public class Main{
 		//this.
 		JFrame jf = new JFrame();
 		jf.setTitle("Title");
-		jf.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		jf.setUndecorated(true);
+		//jf.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		//jf.setUndecorated(true);
+		jf.setSize(1280, 720);
 		jf.setVisible(true);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -39,10 +41,18 @@ public class Main{
                 		}
                 		g.fillRect((getWidth() / 6) * i, (getHeight() / 6) * j, (getWidth() / 6) - 10, (getHeight() / 6) - 10);
                 		int x = getWidth() / 6;
-                		x = (x * i) + (int)(1d/8d) * x;
+                		String text = "String";
+                		g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 20));
+                		int sw = g.getFontMetrics().stringWidth(text);
+                		int sh = g.getFontMetrics().getHeight();
+                		x = (x * i) + ((x - sw) / 2);
                 		int y = getHeight() / 6;
-                		y = (y * j) - (int)(2d/8d) * y;
-                		g.setColor(Color.GREEN);
+                		y = (y * j) + ((y - sh) / 2);
+                		if(j == 0) {
+                			g.setColor(Color.BLACK);
+                		} else {
+                			g.setColor(Color.WHITE);
+                		}
                 		g.drawString("String", x, y);
                 	}
                 }
@@ -50,5 +60,13 @@ public class Main{
         };
         jf.add(panel);
         jf.validate();
+        
+//        try {
+//			Thread.sleep(5000);
+//			System.exit(1);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 }
