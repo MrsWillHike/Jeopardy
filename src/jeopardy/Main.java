@@ -3,8 +3,11 @@ package jeopardy;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,15 +15,44 @@ import javax.swing.JPanel;
 public class Main{
 	
 	public static void main(String args[]) {
-		List<Category> roundOne = new ArrayList<Category>();
-		Category tempCat = new Category("fakename");
-		tempCat.add(new Question("Question", "Answer", 100));
-		//roundOne.add(
-		//this.
+		List<Category> catagories = new ArrayList<Category>();
+		String names[] = {"scout"};
+		String line;
+		String q = "";
+		String a = "";
+		int l;
+		for(int i = 0; i < names.length; i++) {
+			try {
+				Scanner s = new Scanner(new File("catagories/" + names[i] + ".jep"));
+				Category temp = new Category(s.nextLine());
+				while(s.hasNextLine()) {
+					line = s.nextLine();
+					l = 1;
+					q = "";
+					a = "";
+					while(line.charAt(l) != '"') {
+						q = q + line.charAt(l);
+						l++;
+					}
+					l++;
+					while(line.charAt(l) != '"') {
+						l++;
+					}
+					l++;
+					while(line.charAt(l) != '"') {
+						a = a + line.charAt(l);
+						l++;
+					}
+					temp.add(new Question(q, a));
+				}
+				catagories.add(temp);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			System.out.println(catagories.toString());
+		}
 		JFrame jf = new JFrame();
 		jf.setTitle("Title");
-		//jf.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		//jf.setUndecorated(true);
 		jf.setSize(1280, 720);
 		jf.setVisible(true);
 		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,16 +64,18 @@ public class Main{
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.setColor(Color.BLUE);
-                for(int i = 0; i < 6; i++) {
+                String text = "";
+                for(int i = 0; i < catagories.size(); i++) {
                 	for(int j = 0; j < 6; j++) {
                 		if(j == 0) {
                 			g.setColor(Color.RED);
+                			text = catagories.get(i).getName();
                 		} else {
                 			g.setColor(Color.BLUE);
+                			text = catagories.get(i).getQuestion(j).getScore() + "";
                 		}
                 		g.fillRect((getWidth() / 6) * i, (getHeight() / 6) * j, (getWidth() / 6) - 10, (getHeight() / 6) - 10);
                 		int x = getWidth() / 6;
-                		String text = "String";
                 		g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 20));
                 		int sw = g.getFontMetrics().stringWidth(text);
                 		int sh = g.getFontMetrics().getHeight();
@@ -53,7 +87,7 @@ public class Main{
                 		} else {
                 			g.setColor(Color.WHITE);
                 		}
-                		g.drawString("String", x, y);
+                		g.drawString(text, x, y);
                 	}
                 }
             }

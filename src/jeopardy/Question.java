@@ -14,6 +14,18 @@ public class Question {
 		
 	}
 	
+	public Question(String q, String a) {
+		question = q;
+		answer = a;
+		points = 0;
+		
+	}
+	
+	@Override
+	public String toString() {
+		return question + ", " + answer;
+	}
+	
 	public String getQuestion() {
 		return question;
 	}

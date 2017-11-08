@@ -26,4 +26,20 @@ public class Category {
 	public void setName(String n) {
 		name = n;
 	}
+	
+	@Override
+	public String toString() {
+		String out = "[\"";
+		boolean f = false;
+		for(int i = 0; i < questions.size(); i++) {
+			if(f) {
+				out = out + "> ";
+			} else {
+				f = true;
+			}
+			out = out + questions.get(i).toString();
+		}
+		out = out + "]";
+		return out;
+	}
 }
