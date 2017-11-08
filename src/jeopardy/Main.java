@@ -17,38 +17,9 @@ public class Main{
 	public static void main(String args[]) {
 		List<Category> catagories = new ArrayList<Category>();
 		String names[] = {"scout"};
-		String line;
-		String q = "";
-		String a = "";
-		int l;
 		for(int i = 0; i < names.length; i++) {
-			try {
-				Scanner s = new Scanner(new File("catagories/" + names[i] + ".jep"));
-				Category temp = new Category(s.nextLine());
-				while(s.hasNextLine()) {
-					line = s.nextLine();
-					l = 1;
-					q = "";
-					a = "";
-					while(line.charAt(l) != '"') {
-						q = q + line.charAt(l);
-						l++;
-					}
-					l++;
-					while(line.charAt(l) != '"') {
-						l++;
-					}
-					l++;
-					while(line.charAt(l) != '"') {
-						a = a + line.charAt(l);
-						l++;
-					}
-					temp.add(new Question(q, a));
-				}
-				catagories.add(temp);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+			Category temp = new Category("");
+			temp.parse(new File("catagories/" + names[i] + ".jep"));
 			System.out.println(catagories.toString());
 		}
 		JFrame jf = new JFrame();
