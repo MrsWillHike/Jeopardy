@@ -10,14 +10,15 @@ import javax.swing.JPanel;
 
 public class GamePanel{
 	
-	static JFrame jf;
+	private static JFrame jf;
+	private static JPanel panel;
 	
 	public static void setGamePanel(JFrame j) {
 		jf = j;
 	}
 	
 	public static boolean drawMainPanel(List<Category> roundOne) {
-		JPanel panel = new JPanel() {
+		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -35,10 +36,10 @@ public class GamePanel{
                 for(int i = 0; i < roundOne.size(); i++) {
                 	g.setColor(Color.RED);
                 	text = roundOne.get(i).getName();
-                	g.fillRect((getWidth() / 6) * i, 0, (getWidth() / 6) - 10, (getHeight() / 6) - 10);
+                	g.fillRect((getWidth() / 7) * i, 0, (getWidth() / 7) - 10, (getHeight() / 6) - 10);
                 	sw = g.getFontMetrics().stringWidth(text);
             		sh = g.getFontMetrics().getHeight();
-            		bw = getWidth() / 6;
+            		bw = getWidth() / 7;
             		x = (bw * i) + ((bw - sw) / 2);
             		y = getHeight() / 6;
             		y = ((y - sh) / 2);
@@ -46,10 +47,10 @@ public class GamePanel{
             		g.drawString(text, x, y);
                 	for(int j = 0; j < roundOne.get(i).size(); j++) {
                 		g.setColor(Color.BLUE);
-                		g.fillRect((getWidth() / 6) * i, (getHeight() / 6) * (j + 1), (getWidth() / 6) - 10, (getHeight() / 6) - 10);
+                		g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
                 		text = roundOne.get(i).getQuestion(j).getScore() + "";
                 		sw = g.getFontMetrics().stringWidth(text);
-                		bw = getWidth() / 6;
+                		bw = getWidth() / 7;
                 		x = (bw * i) + ((bw - sw) / 2);
                 		bh = getHeight() / 6;
                 		y = (bh * (j + 1)) + ((bh - sh) / 2);
@@ -65,7 +66,7 @@ public class GamePanel{
 	}
 	
 	public static boolean displayText(String text) {
-		JPanel panel = new JPanel() {
+		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
