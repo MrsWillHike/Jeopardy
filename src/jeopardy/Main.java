@@ -15,9 +15,8 @@ import javax.swing.JTextField;
 public class Main{
 	
 	public static void main(String args[]) {
-		
-		
 		List<Category> roundOne = new ArrayList<Category>();
+		KeyListen.setQuestions(roundOne);
 		String names[] = {"cooking", "fire", "firstaid", "knives", "scoutstuff", "water"};
 		for(int i = 0; i < names.length; i++) {
 			Category temp = new Category("");
@@ -37,8 +36,8 @@ public class Main{
 			@Override public void keyPressed(KeyEvent e) {KeyListen.keyPressed(e);}
 		});
 		
-		GamePanel gp = new GamePanel(jf);
-		gp.drawMainPanel(roundOne);
+		GamePanel.setGamePanel(jf);
+		GamePanel.drawMainPanel(roundOne);
 		
 		try {
 			Thread.sleep(50);
@@ -47,33 +46,6 @@ public class Main{
 			e1.printStackTrace();
 		}
 		
-		displayText(roundOne.get(1).getQuestion(1).getQuestion(), jf);
-	}
-	
-	public static boolean displayText(String text, JFrame jf) {
-		JPanel panel = new JPanel() {
-        	@Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setColor(Color.BLACK);
-                g.fillRect(0,  0,  getWidth(), getHeight());
-                g.setColor(Color.BLUE);
-                g.fillRect(10,  10, getWidth() - 20, getHeight() - 20);
-                g.setColor(Color.BLACK);
-                g.fillRect(20,  20, getWidth() - 40, getHeight() - 40);
-                g.setColor(Color.BLUE);
-                g.fillRect(25,  25, getWidth() - 50, getHeight() - 50);
-                g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 60));
-                int sw = g.getFontMetrics().stringWidth(text);
-                int sh = g.getFontMetrics().getHeight();
-        		int x = ((getWidth() - sw) / 2);
-        		int y = ((getHeight() - sh) / 2);
-        		g.setColor(Color.WHITE);
-        		g.drawString(text, x, y);
-        	}
-		};
-		jf.add(panel);
-        jf.validate();
-        return true;
+		//GamePanel.displayText(roundOne.get(1).getQuestion(1).getQuestion());
 	}
 }
