@@ -32,7 +32,7 @@ public class Category {
 	
 	@Override
 	public String toString() {
-		String out = "[\"";
+		String out = name + "[\"";
 		boolean f = false;
 		for(int i = 0; i < questions.size(); i++) {
 			if(f) {
@@ -46,7 +46,11 @@ public class Category {
 		return out;
 	}
 	
-	public void parse(File f) {
+	public int size() {
+		return questions.size();
+	}
+	
+	public void parse(File f, int pp) {
 		try {
 			String line = "";
 			int l = 0;
@@ -54,6 +58,7 @@ public class Category {
 			String a = "";
 			Scanner s = new Scanner(f);
 			name = s.nextLine();
+			int pts;
 			while(s.hasNextLine()) {
 				line = s.nextLine();
 				l = 1;
@@ -72,8 +77,10 @@ public class Category {
 					a = a + line.charAt(l);
 					l++;
 				}
-				add(new Question(q, a));
+				pts = (questions.size() + 1) * pp;
+				questions.add(new Question(q, a, pts));
 			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
