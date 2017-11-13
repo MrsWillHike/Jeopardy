@@ -17,7 +17,7 @@ public class GamePanel{
 		jf = j;
 	}
 	
-	public static boolean drawMainPanel(List<Category> roundOne) {
+	public static boolean drawMainPanel(List<Category> cat) {
 		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
@@ -33,29 +33,33 @@ public class GamePanel{
                 int bw;
                 int bh;
                 g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 20));
-                for(int i = 0; i < roundOne.size(); i++) {
-                	g.setColor(Color.RED);
-                	text = roundOne.get(i).getName();
-                	g.fillRect((getWidth() / 7) * i, 0, (getWidth() / 7) - 10, (getHeight() / 6) - 10);
-                	sw = g.getFontMetrics().stringWidth(text);
-            		sh = g.getFontMetrics().getHeight();
-            		bw = getWidth() / 7;
-            		x = (bw * i) + ((bw - sw) / 2);
-            		y = getHeight() / 6;
-            		y = ((y - sh) / 2);
-            		g.setColor(Color.WHITE);
-            		g.drawString(text, x, y);
-                	for(int j = 0; j < roundOne.get(i).size(); j++) {
-                		g.setColor(Color.BLUE);
-                		g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
-                		text = roundOne.get(i).getQuestion(j).getScore() + "";
-                		sw = g.getFontMetrics().stringWidth(text);
-                		bw = getWidth() / 7;
-                		x = (bw * i) + ((bw - sw) / 2);
-                		bh = getHeight() / 6;
-                		y = (bh * (j + 1)) + ((bh - sh) / 2);
-                		g.setColor(Color.WHITE);
-                		g.drawString(text, x, y);
+                for(int i = 0; i < cat.size(); i++) {
+                	if(!cat.get(i).isDone()) {
+	                	g.setColor(Color.RED);
+	                	text = cat.get(i).getName();
+	                	g.fillRect((getWidth() / 7) * i, 0, (getWidth() / 7) - 10, (getHeight() / 6) - 10);
+	                	sw = g.getFontMetrics().stringWidth(text);
+	            		sh = g.getFontMetrics().getHeight();
+	            		bw = getWidth() / 7;
+	            		x = (bw * i) + ((bw - sw) / 2);
+	            		y = getHeight() / 6;
+	            		y = ((y - sh) / 2);
+	            		g.setColor(Color.WHITE);
+	            		g.drawString(text, x, y);
+	                	for(int j = 0; j < cat.get(i).size(); j++) {
+	                		if(!cat.get(i).getQuestion(j).isUsed()) {
+		                		g.setColor(Color.BLUE);
+		                		g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
+		                		text = cat.get(i).getQuestion(j).getScore() + "";
+		                		sw = g.getFontMetrics().stringWidth(text);
+		                		bw = getWidth() / 7;
+		                		x = (bw * i) + ((bw - sw) / 2);
+		                		bh = getHeight() / 6;
+		                		y = (bh * (j + 1)) + ((bh - sh) / 2);
+		                		g.setColor(Color.WHITE);
+		                		g.drawString(text, x, y);
+	                		}
+	                	}
                 	}
                 }
             }
@@ -64,8 +68,10 @@ public class GamePanel{
         jf.validate();
         return true;
 	}
-	
 	public static boolean displayText(String text) {
+		return displayText(text, Color.BLUE);
+	}
+	public static boolean displayText(String text, Color c) {
 		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {

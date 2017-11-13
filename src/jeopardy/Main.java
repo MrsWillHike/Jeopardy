@@ -37,6 +37,10 @@ public class Main{
 		});
 		
 		GamePanel.setGamePanel(jf);
+		
+		//GamePanel.displayText("Jeopardy");
+		//long del = System.currentTimeMillis() + 5000; while(del > System.currentTimeMillis()) {}
+		
 		GamePanel.drawMainPanel(roundOne);
 		
 		try {

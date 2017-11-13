@@ -30,6 +30,17 @@ public class Category {
 		name = n;
 	}
 	
+	public boolean isDone() {
+		boolean isDone = true;
+		for(int i = 0; i < questions.size(); i++) {
+			if(questions.get(i).isUsed() == false) {
+				isDone = false;
+				break;
+			}
+		}
+		return isDone;
+	}
+	
 	@Override
 	public String toString() {
 		String out = name + "[\"";

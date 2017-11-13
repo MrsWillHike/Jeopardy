@@ -5,7 +5,7 @@ public class Question {
 	private String question;
 	private String answer;
 	private int points;
-	boolean isUsed;
+	private boolean isUsed;
 	
 	public Question(String q, String a, int p) {
 		question = q;
@@ -38,7 +38,7 @@ public class Question {
 		return points;
 	}
 	
-	public boolean getIsUsed() {
+	public boolean isUsed() {
 		return isUsed;
 	}
 	

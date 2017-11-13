@@ -1,21 +1,29 @@
 package jeopardy;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTextField;
 
 public class KeyListen {
 	
-	static private int catSel = -1;
-	static private int ptSel = -1;
-	static private int npt = -1;
+	private static int catSel = -1;
+	private static int ptSel = -1;
+	private static int npt = -1;
 	private static int nct = -1;
 	private static List<Category> cat;
 	private static int num = 0;
 	private static int dig = 1;
 	private static boolean ch = false;
+	private static int team = -1;
+	private static boolean teamPrinted = false;
+	private static String ques = null;
+	private static int teamSel = -1;
+	private static int teamAns = -1;
+	private static boolean canAns = true;
 	
 	public static void keyTyped(KeyEvent e) {}
 	
@@ -52,40 +60,66 @@ public class KeyListen {
 		case KeyEvent.VK_NUMPAD8: num = (num * 10) + 8; ch = true; break;
 		case KeyEvent.VK_NUMPAD9: num = (num * 10) + 9; ch = true; break;
 		
+		// cancel question selection
+		case KeyEvent.VK_ESCAPE: {GamePanel.drawMainPanel(cat);npt = -1;nct = -1;ques = null;} break;
+		
 		// Handle right or wrong
-		case KeyEvent.VK_ESCAPE: {
-			GamePanel.drawMainPanel(cat);
+		// should be redone
+		case KeyEvent.VK_ENTER: {GamePanel.drawMainPanel(cat);npt = -1;nct = -1;} break;
+		case KeyEvent.VK_BACK_SPACE: {if(nct != -1 && npt != -1) {
+			GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
 			npt = -1;
 			nct = -1;
-		} break;
-		case KeyEvent.VK_ENTER: {
-			GamePanel.drawMainPanel(cat);
-			npt = -1;
-			nct = -1;
-		} break;
-		case KeyEvent.VK_BACK_SPACE: {
-			if(nct != -1 && npt != -1) {
-				GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
-				npt = -1;
-				nct = -1;
-				
 			}
 		}
-		}
 		
+		// select team
+		case KeyEvent.VK_F1: {team = 0; teamPrinted = true;} break;
+		case KeyEvent.VK_F2: {team = 1; teamPrinted = true;} break;
+		case KeyEvent.VK_F3: {team = 2; teamPrinted = true;} break;
+		case KeyEvent.VK_F4: {team = 3; teamPrinted = true;} break;
+		
+		// Happens when a team buzzes in
+		case KeyEvent.VK_F9: {teamSel = 0;} break;
+		case KeyEvent.VK_F10: {teamSel = 1;} break;
+		case KeyEvent.VK_F11: {teamSel = 2;} break;
+		case KeyEvent.VK_F12: {teamSel = 3;} break;
+		
+		} // end of key listeners
+
+		// Begin doers
+		
+		// Handle teams buzzing in
+		if(teamSel != -1 && canAns == true) {
+			GamePanel.displayText(ques, Color.RED);
+			teamAns = teamSel;
+		}
+		teamSel = -1;
+		
+		// Print number to console
 		if(ch == true) {
 			ch = false;
 			System.out.println(num);
 		}
 		ch = false;
+		
 		// display correct screen
 		if(catSel != -1 && ptSel != -1) {
-			GamePanel.displayText(cat.get(catSel).getQuestion(ptSel).getQuestion());
+			ques = cat.get(catSel).getQuestion(ptSel).getQuestion();
+			GamePanel.displayText(ques);
+			cat.get(catSel).getQuestion(ptSel).setIsUsed(true);
 			npt = ptSel;
 			nct = catSel;
 			catSel = -1;
+			canAns = true;
 		}
 		ptSel = -1;
+		
+		// Print selected team to console
+		if(teamPrinted == true) {
+			System.out.println("team " + team);
+			teamPrinted = false;
+		}
 	}
 	
 	public static void setQuestions(List<Category> c) {
