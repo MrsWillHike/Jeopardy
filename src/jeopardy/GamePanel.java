@@ -31,7 +31,8 @@ public class GamePanel{
 	
 	public static boolean drawMainPanel(List<Category> cat) {
 		panel = new JPanel() {
-        	@Override
+
+			@Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.setColor(Color.BLACK);

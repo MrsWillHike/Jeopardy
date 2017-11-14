@@ -4,34 +4,32 @@ import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JTextField;
-
 public class KeyListen {
+	public static boolean isDone;
 	
 	private static int catSel = -1;
 	private static int ptSel = -1;
 	private static int npt = -1;
 	private static int nct = -1;
-	private static List<Category> cat;
-	private static int num = 0;
-	private static int dig = 1;
-	private static boolean ch = false;
 	private static int team = -1;
+	private static int num = 0;
+	private static int numMult = 1;
+	private static int wrong = 0;
+	private static boolean ch = false;
+	private static boolean canAns = false;
 	private static boolean teamPrinted = false;
 	private static String ques = null;
 	private static Team teamSel = null;
 	private static Team teamAns = null;
-	private static boolean canAns = false;
-	
+	private static Team teamMod = null;
 	private static Team teamRed = new Team(Color.RED, "Red");
 	private static Team teamYellow = new Team(Color.YELLOW, "Yellow");
 	private static Team teamGreen = new Team(Color.GREEN, "Green");
 	private static Team teamBlue = new Team(Color.CYAN, "Blue");
-	
+	private static Mode mode = Mode.RUN;
+	private static List<Category> cat;
 	private static Robot robot;
 	
 	public static void init() {
@@ -75,33 +73,10 @@ public class KeyListen {
 		case KeyEvent.VK_NUMPAD7: num = (num * 10) + 7; ch = true; break;
 		case KeyEvent.VK_NUMPAD8: num = (num * 10) + 8; ch = true; break;
 		case KeyEvent.VK_NUMPAD9: num = (num * 10) + 9; ch = true; break;
+		case KeyEvent.VK_SUBTRACT: numMult = numMult * -1; ch = true; break;
 		
 		// cancel question selection
-		case KeyEvent.VK_ESCAPE: {GamePanel.drawMainPanel(cat);npt = -1;nct = -1;ques = null;} break;
-		
-		// Handle right or wrong
-		// TODO redo/fix
-		case KeyEvent.VK_BACK_SPACE: { // correct
-			GamePanel.drawMainPanel(cat);
-			System.out.println("correct");
-			teamAns.addScore(cat.get(nct).getQuestion(npt).getScore());
-			npt = -1;
-			nct = -1;
-		} break;
-		case KeyEvent.VK_BACK_SLASH: { // wrong
-			if(teamAns != null && canAns == false) {
-				GamePanel.displayText(ques);
-				canAns = true;
-				teamAns.setGuessed(true);
-				System.out.println("wrong");
-			}
-		} break;
-		
-		// select team
-		case KeyEvent.VK_F1: {team = 0; teamPrinted = true;} break;
-		case KeyEvent.VK_F2: {team = 1; teamPrinted = true;} break;
-		case KeyEvent.VK_F3: {team = 2; teamPrinted = true;} break;
-		case KeyEvent.VK_F4: {team = 3; teamPrinted = true;} break;
+		case KeyEvent.VK_ESCAPE: {GamePanel.drawMainPanel(cat);exit();} break;
 		
 		// Happens when a team buzzes in
 		case KeyEvent.VK_F9: {teamSel = teamRed;} break;
@@ -109,6 +84,55 @@ public class KeyListen {
 		case KeyEvent.VK_F11: {teamSel = teamGreen;} break;
 		case KeyEvent.VK_F12: {teamSel = teamBlue;} break;
 		
+		// Handle correct or wrong answer
+		case KeyEvent.VK_BACK_SPACE: { // correct
+			if(teamAns != null) {
+				GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
+				teamAns.addScore(cat.get(nct).getQuestion(npt).getScore());
+				exit();
+			}
+		} break;
+		case KeyEvent.VK_BACK_SLASH: { // wrong
+			if(teamAns != null && canAns == false) {
+				GamePanel.displayText(ques);
+				canAns = true;
+				teamAns.setGuessed(true);
+				teamAns.addScore(cat.get(nct).getQuestion(npt).getScore() * -1);
+				wrong++;
+			}
+		} break;
+		
+		// select team
+		case KeyEvent.VK_F1: {teamMod = teamRed;} break;
+		case KeyEvent.VK_F2: {teamMod = teamYellow;} break;
+		case KeyEvent.VK_F3: {teamMod = teamGreen;} break;
+		case KeyEvent.VK_F4: {teamMod = teamBlue;} break;
+		
+		case KeyEvent.VK_I: {
+			mode = Mode.SCORE_SET;
+			num = 0;
+			numMult = 1;
+		} break;
+		case KeyEvent.VK_K: {
+			mode = Mode.SCORE_ADD;
+			numMult = 1;
+			num = 0;
+		} break;
+		case KeyEvent.VK_ENTER: {
+			if(e.getKeyLocation() == 4) {
+				switch(mode) {
+				case RUN: {} break;
+				case SCORE_ADD: teamMod.addScore(num * numMult); break;
+				case SCORE_SET: teamMod.setScore(num * numMult); break;
+				default: {} break;
+				}
+				GamePanel.drawMainPanel(cat);
+			}
+		} break;
+		case KeyEvent.VK_B: {
+			Main.beginRoundTwo();
+			System.out.println("IsDone set to true");
+		} break;
 		} // end of key listeners
 
 		// Begin doers
@@ -121,10 +145,16 @@ public class KeyListen {
 		}
 		teamSel = null;
 		
+		// End if everyone has guessed wrong
+		if(wrong >= 4) {
+			GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
+			exit();
+		}
+		
 		// Print number to console
 		if(ch == true) {
 			ch = false;
-			System.out.println(num);
+			System.out.println(num * numMult);
 		}
 		ch = false;
 		
@@ -162,5 +192,30 @@ public class KeyListen {
 	
 	public static void setQuestions(List<Category> c) {
 		cat = c;
+	}
+	
+	private static void exit() {
+		npt = -1;
+		nct = -1;
+		ptSel = -1;
+		catSel = -1;
+		teamRed.setGuessed(false);
+		teamYellow.setGuessed(false);
+		teamGreen.setGuessed(false);
+		teamBlue.setGuessed(false);
+		teamAns = null;
+		ques = null;
+		wrong = 0;
+		canAns = false;
+		isDone = true;
+		for(int i = 0; i < cat.size(); i++) {
+			if(cat.get(i).isDone() == false) {
+				isDone = false;
+				break;
+			}
+		}
+		if(isDone == true) {
+			Main.beginRoundTwo();
+		}
 	}
 }

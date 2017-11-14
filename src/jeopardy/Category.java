@@ -61,12 +61,14 @@ public class Category {
 		return questions.size();
 	}
 	
+	@SuppressWarnings("resource")
 	public void parse(File f, int pp) {
 		try {
 			String line = "";
 			int l = 0;
 			String q = "";
 			String a = "";
+			
 			Scanner s = new Scanner(f);
 			name = s.nextLine();
 			int pts;

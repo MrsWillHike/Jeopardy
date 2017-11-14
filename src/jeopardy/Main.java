@@ -1,22 +1,11 @@
 package jeopardy;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.MenuBar;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.InputMap;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 
 public class Main{
 	
@@ -34,7 +23,7 @@ public class Main{
 		}
 		System.out.println(roundOne.toString());
 		JFrame jf = new JFrame();
-		
+		GamePanel.setGamePanel(jf);
 		jf.setTitle("Title");
 		jf.setSize(1280, 720);
 		jf.setVisible(true);
@@ -44,22 +33,20 @@ public class Main{
 			@Override public void keyReleased(KeyEvent e) {KeyListen.keyReleased(e);}
 			@Override public void keyPressed(KeyEvent e) {KeyListen.keyPressed(e);}
 		});
-		
-		GamePanel.setGamePanel(jf);
-		
-		
-		//GamePanel.displayText("Jeopardy");
-		//long del = System.currentTimeMillis() + 5000; while(del > System.currentTimeMillis()) {}
-		
-		GamePanel.drawMainPanel(roundOne);
-		
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		GamePanel.drawMainPanel(roundOne);		
+	}
+	
+	public static void beginRoundTwo() {
+		List<Category> roundTwo = new ArrayList<Category>();
+		String namesTwo[] = {"fire", "water", "knives", "cooking", "firstaid", "scoutstuff"};
+		for(int i = 0; i < namesTwo.length; i++) {
+			Category temp = new Category("");
+			temp.parse(new File("catagories/" + namesTwo[i] + ".jep"), 400);
+			roundTwo.add(temp);
 		}
-		
-		//GamePanel.displayText(roundOne.get(1).getQuestion(1).getQuestion());
+		System.out.println(roundTwo.toString());
+		GamePanel.drawMainPanel(roundTwo);
+		KeyListen.isDone = false;
+		KeyListen.setQuestions(roundTwo);
 	}
 }

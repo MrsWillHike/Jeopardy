@@ -1,11 +1,11 @@
 package jeopardy;
 
-public class Player {
+public class PlayerOld {
 	
 	private int score;
 	private String name;
 	
-	public Player(String n) {
+	public PlayerOld(String n) {
 		name = n;
 	}
 	
