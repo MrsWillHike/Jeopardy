@@ -21,9 +21,14 @@ public class KeyListen {
 	private static int team = -1;
 	private static boolean teamPrinted = false;
 	private static String ques = null;
-	private static int teamSel = -1;
-	private static int teamAns = -1;
-	private static boolean canAns = true;
+	private static Team teamSel = null;
+	private static Team teamAns = null;
+	private static boolean canAns = false;
+	
+	private static Team teamRed = new Team(Color.RED);
+	private static Team teamYellow = new Team(Color.YELLOW);
+	private static Team teamGreen = new Team(Color.GREEN);
+	private static Team teamBlue = new Team(Color.CYAN);
 	
 	public static void keyTyped(KeyEvent e) {}
 	
@@ -65,13 +70,20 @@ public class KeyListen {
 		
 		// Handle right or wrong
 		// should be redone
-		case KeyEvent.VK_ENTER: {GamePanel.drawMainPanel(cat);npt = -1;nct = -1;} break;
-		case KeyEvent.VK_BACK_SPACE: {if(nct != -1 && npt != -1) {
-			GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
+		case KeyEvent.VK_BACK_SPACE: { // correct
+			GamePanel.drawMainPanel(cat);
 			npt = -1;
 			nct = -1;
+			System.out.println("correct");
+		} break;
+		case KeyEvent.VK_BACK_SLASH: { // wrong
+			if(nct != -1 && npt != -1) {
+				GamePanel.displayText(ques);
+				canAns = true;
+				teamSel.setGuessed(true);
+				System.out.println("wrong");
 			}
-		}
+		} break;
 		
 		// select team
 		case KeyEvent.VK_F1: {team = 0; teamPrinted = true;} break;
@@ -80,21 +92,22 @@ public class KeyListen {
 		case KeyEvent.VK_F4: {team = 3; teamPrinted = true;} break;
 		
 		// Happens when a team buzzes in
-		case KeyEvent.VK_F9: {teamSel = 0;} break;
-		case KeyEvent.VK_F10: {teamSel = 1;} break;
-		case KeyEvent.VK_F11: {teamSel = 2;} break;
-		case KeyEvent.VK_F12: {teamSel = 3;} break;
+		case KeyEvent.VK_F9: {teamSel = teamRed;} break;
+		case KeyEvent.VK_F10: {teamSel = teamYellow;} break;
+		case KeyEvent.VK_F11: {teamSel = teamGreen;} break;
+		case KeyEvent.VK_F12: {teamSel = teamBlue;} break;
 		
 		} // end of key listeners
 
 		// Begin doers
 		
 		// Handle teams buzzing in
-		if(teamSel != -1 && canAns == true) {
-			GamePanel.displayText(ques, Color.RED);
+		if(teamSel != null && canAns == true && teamSel.hasGuessed() == false) {
+			GamePanel.displayText(ques, teamSel.getColor());
+			canAns = false;
 			teamAns = teamSel;
 		}
-		teamSel = -1;
+		teamSel = null;
 		
 		// Print number to console
 		if(ch == true) {
@@ -104,7 +117,7 @@ public class KeyListen {
 		ch = false;
 		
 		// display correct screen
-		if(catSel != -1 && ptSel != -1) {
+		if(catSel != -1 && ptSel != -1 && canAns == false) {
 			ques = cat.get(catSel).getQuestion(ptSel).getQuestion();
 			GamePanel.displayText(ques);
 			cat.get(catSel).getQuestion(ptSel).setIsUsed(true);

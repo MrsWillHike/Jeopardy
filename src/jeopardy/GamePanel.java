@@ -72,13 +72,16 @@ public class GamePanel{
 		return displayText(text, Color.BLUE);
 	}
 	public static boolean displayText(String text, Color c) {
+		if(text.equals(null)) {
+			return false;
+		}
 		panel = new JPanel() {
         	@Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.setColor(Color.BLACK);
                 g.fillRect(0,  0,  getWidth(), getHeight());
-                g.setColor(Color.BLUE);
+                g.setColor(c);
                 g.fillRect(10,  10, getWidth() - 20, getHeight() - 20);
                 g.setColor(Color.BLACK);
                 g.fillRect(20,  20, getWidth() - 40, getHeight() - 40);
