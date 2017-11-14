@@ -1,6 +1,8 @@
 package jeopardy;
 
+import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -25,18 +27,27 @@ public class KeyListen {
 	private static Team teamAns = null;
 	private static boolean canAns = false;
 	
-	private static Team teamRed = new Team(Color.RED);
-	private static Team teamYellow = new Team(Color.YELLOW);
-	private static Team teamGreen = new Team(Color.GREEN);
-	private static Team teamBlue = new Team(Color.CYAN);
+	private static Team teamRed = new Team(Color.RED, "Red");
+	private static Team teamYellow = new Team(Color.YELLOW, "Yellow");
+	private static Team teamGreen = new Team(Color.GREEN, "Green");
+	private static Team teamBlue = new Team(Color.CYAN, "Blue");
+	
+	private static Robot robot;
+	
+	public static void init() {
+		try {
+			robot = new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+		GamePanel.setTeams(teamRed, teamYellow, teamGreen, teamBlue);
+	}
 	
 	public static void keyTyped(KeyEvent e) {}
 	
 	public static void keyReleased(KeyEvent e) {}
 	
 	public static void keyPressed(KeyEvent e) {
-		
-		
 		switch(e.getKeyCode()) {
 		// Select category
 		case KeyEvent.VK_Q: catSel = 0; break;
@@ -53,7 +64,7 @@ public class KeyListen {
 		case KeyEvent.VK_F: ptSel = 3; break;
 		case KeyEvent.VK_G: ptSel = 4; break;
 		
-		// Number Pad Imput Test
+		// Number Pad Input Test
 		case KeyEvent.VK_NUMPAD0: num = (num * 10) + 0; ch = true; break;
 		case KeyEvent.VK_NUMPAD1: num = (num * 10) + 1; ch = true; break;
 		case KeyEvent.VK_NUMPAD2: num = (num * 10) + 2; ch = true; break;
@@ -69,18 +80,19 @@ public class KeyListen {
 		case KeyEvent.VK_ESCAPE: {GamePanel.drawMainPanel(cat);npt = -1;nct = -1;ques = null;} break;
 		
 		// Handle right or wrong
-		// should be redone
+		// TODO redo/fix
 		case KeyEvent.VK_BACK_SPACE: { // correct
 			GamePanel.drawMainPanel(cat);
+			System.out.println("correct");
+			teamAns.addScore(cat.get(nct).getQuestion(npt).getScore());
 			npt = -1;
 			nct = -1;
-			System.out.println("correct");
 		} break;
 		case KeyEvent.VK_BACK_SLASH: { // wrong
-			if(nct != -1 && npt != -1) {
+			if(teamAns != null && canAns == false) {
 				GamePanel.displayText(ques);
 				canAns = true;
-				teamSel.setGuessed(true);
+				teamAns.setGuessed(true);
 				System.out.println("wrong");
 			}
 		} break;
@@ -132,6 +144,19 @@ public class KeyListen {
 		if(teamPrinted == true) {
 			System.out.println("team " + team);
 			teamPrinted = false;
+		}
+		
+		// TODO figure out how to do this properly
+		// Bodge to prevent f10 from creating errors
+		// Probibly need will be eliminated when i use F13-16
+		// Presses and releases F10 to undo whatever F10 does
+		try {
+			if(e.getKeyCode() == KeyEvent.VK_F10) {
+				robot.keyPress(KeyEvent.VK_F10);
+				robot.keyRelease(KeyEvent.VK_F10);
+			}
+		} catch(NullPointerException ex) {
+			System.err.println("NullPointerException at KeyListen.java:144,145");
 		}
 	}
 	

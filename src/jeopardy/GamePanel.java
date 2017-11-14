@@ -13,8 +13,20 @@ public class GamePanel{
 	private static JFrame jf;
 	private static JPanel panel;
 	
+	private static Team teamRed;
+	private static Team teamYellow;
+	private static Team teamGreen;
+	private static Team teamBlue;
+	
 	public static void setGamePanel(JFrame j) {
 		jf = j;
+	}
+	
+	public static void setTeams(Team red, Team yellow, Team green, Team blue) {
+		teamRed = red;
+		teamYellow = yellow;
+		teamGreen = green;
+		teamBlue = blue;
 	}
 	
 	public static boolean drawMainPanel(List<Category> cat) {
@@ -30,8 +42,8 @@ public class GamePanel{
                 int sh = g.getFontMetrics().getHeight();
                 int x;
                 int y;
-                int bw;
-                int bh;
+                int bw = getWidth() / 7;
+                int bh = getHeight() / 6;
                 g.setFont(new Font(g.getFont().getName(), Font.PLAIN, 20));
                 for(int i = 0; i < cat.size(); i++) {
                 	if(!cat.get(i).isDone()) {
@@ -40,10 +52,8 @@ public class GamePanel{
 	                	g.fillRect((getWidth() / 7) * i, 0, (getWidth() / 7) - 10, (getHeight() / 6) - 10);
 	                	sw = g.getFontMetrics().stringWidth(text);
 	            		sh = g.getFontMetrics().getHeight();
-	            		bw = getWidth() / 7;
 	            		x = (bw * i) + ((bw - sw) / 2);
-	            		y = getHeight() / 6;
-	            		y = ((y - sh) / 2);
+	            		y = ((bh - sh) / 2);
 	            		g.setColor(Color.WHITE);
 	            		g.drawString(text, x, y);
 	                	for(int j = 0; j < cat.get(i).size(); j++) {
@@ -52,9 +62,7 @@ public class GamePanel{
 		                		g.fillRect((getWidth() / 7) * i, (getHeight() / 6) * (j + 1), (getWidth() / 7) - 10, (getHeight() / 6) - 10);
 		                		text = cat.get(i).getQuestion(j).getScore() + "";
 		                		sw = g.getFontMetrics().stringWidth(text);
-		                		bw = getWidth() / 7;
 		                		x = (bw * i) + ((bw - sw) / 2);
-		                		bh = getHeight() / 6;
 		                		y = (bh * (j + 1)) + ((bh - sh) / 2);
 		                		g.setColor(Color.WHITE);
 		                		g.drawString(text, x, y);
@@ -62,15 +70,38 @@ public class GamePanel{
 	                	}
                 	}
                 }
+                drawScore(g, teamRed, this, cat.size(), 0);
+                drawScore(g, teamYellow, this, cat.size(), 1);
+                drawScore(g, teamGreen, this, cat.size(), 2);
+                drawScore(g, teamBlue, this, cat.size(), 3);
             }
         };
         jf.add(panel);
         jf.validate();
         return true;
 	}
+	
+	private static void drawScore(Graphics g, Team t, JPanel p, int w, int j) {
+		int bw = p.getWidth() / 7;
+        int bh = p.getHeight() / 6;
+        String text = t.getName();
+        int sw = g.getFontMetrics().stringWidth(text);
+        int sh = g.getFontMetrics().getHeight();
+        int x = (bw * w) + ((bw - sw) / 2);
+        int y = (bh * (j)) + ((bh - sh) / 2);
+        g.setColor(t.getColor());
+		g.drawString(text, x, y);
+		y = y + sh;
+		text = ((Integer) t.getScore()).toString();
+        sw = g.getFontMetrics().stringWidth(text);
+        x = (bw * w) + ((bw - sw) / 2);
+        g.drawString(text,  x,  y);
+	}
+	
 	public static boolean displayText(String text) {
 		return displayText(text, Color.BLUE);
 	}
+	
 	public static boolean displayText(String text, Color c) {
 		if(text.equals(null)) {
 			return false;

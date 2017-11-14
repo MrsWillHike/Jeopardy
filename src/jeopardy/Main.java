@@ -3,20 +3,28 @@ package jeopardy;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.MenuBar;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.InputMap;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class Main{
 	
 	public static void main(String args[]) {
 		List<Category> roundOne = new ArrayList<Category>();
 		KeyListen.setQuestions(roundOne);
+		KeyListen.init();
+		
 		String names[] = {"cooking", "fire", "firstaid", "knives", "scoutstuff", "water"};
 		for(int i = 0; i < names.length; i++) {
 			Category temp = new Category("");
@@ -26,6 +34,7 @@ public class Main{
 		}
 		System.out.println(roundOne.toString());
 		JFrame jf = new JFrame();
+		
 		jf.setTitle("Title");
 		jf.setSize(1280, 720);
 		jf.setVisible(true);
@@ -37,6 +46,7 @@ public class Main{
 		});
 		
 		GamePanel.setGamePanel(jf);
+		
 		
 		//GamePanel.displayText("Jeopardy");
 		//long del = System.currentTimeMillis() + 5000; while(del > System.currentTimeMillis()) {}

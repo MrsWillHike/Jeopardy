@@ -8,12 +8,14 @@ public class Team {
 	private Color color;
 	private static int count;
 	private int num;
+	private String name;
 	
 	public Team() {
 		score = 0;
 		didGuess = false;
 		color = Color.BLUE;
 		num = ++count;
+		name = "";
 	}
 	
 	public Team(Color c) {
@@ -21,6 +23,19 @@ public class Team {
 		didGuess = false;
 		color = c;
 		num = ++count;
+		name = "";
+	}
+	
+	public Team(Color c, String n) {
+		score = 0;
+		didGuess = false;
+		color = c;
+		num = ++count;
+		name = n;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public int getScore() {
