@@ -10,6 +10,12 @@ import javax.swing.JFrame;
 public class Main{
 	
 	public static void main(String args[]) {
+		try {
+			Serial.begin();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		List<Category> roundOne = new ArrayList<Category>();
 		KeyListen.setQuestions(roundOne);
 		KeyListen.init();
@@ -48,5 +54,9 @@ public class Main{
 		GamePanel.drawMainPanel(roundTwo);
 		KeyListen.isDone = false;
 		KeyListen.setQuestions(roundTwo);
+	}
+	
+	public static void beginRoundThree() {
+		GamePanel.displayText("Final Jeopardy");
 	}
 }

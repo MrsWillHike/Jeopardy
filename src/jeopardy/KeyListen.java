@@ -17,9 +17,11 @@ public class KeyListen {
 	private static int num = 0;
 	private static int numMult = 1;
 	private static int wrong = 0;
+	private static int mayLeave = 0;
 	private static boolean ch = false;
 	private static boolean canAns = false;
 	private static boolean teamPrinted = false;
+	private static boolean hasSelCat = false;
 	private static String ques = null;
 	private static Team teamSel = null;
 	private static Team teamAns = null;
@@ -31,6 +33,7 @@ public class KeyListen {
 	private static Mode mode = Mode.RUN;
 	private static List<Category> cat;
 	private static Robot robot;
+	private static int round = 1;
 	
 	public static void init() {
 		try {
@@ -89,7 +92,7 @@ public class KeyListen {
 			if(teamAns != null) {
 				GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
 				teamAns.addScore(cat.get(nct).getQuestion(npt).getScore());
-				exit();
+				mayLeave = 1;
 			}
 		} break;
 		case KeyEvent.VK_BACK_SLASH: { // wrong
@@ -99,6 +102,7 @@ public class KeyListen {
 				teamAns.setGuessed(true);
 				teamAns.addScore(cat.get(nct).getQuestion(npt).getScore() * -1);
 				wrong++;
+				System.out.println(teamAns.getName() + " got it wrong " + wrong);
 			}
 		} break;
 		
@@ -127,54 +131,18 @@ public class KeyListen {
 				default: {} break;
 				}
 				GamePanel.drawMainPanel(cat);
+			} else if(e.getKeyLocation() == 1) {
+				if(mayLeave == 1) {
+					GamePanel.drawMainPanel(cat);
+					exit();
+					mayLeave = 0;
+				}
 			}
 		} break;
 		case KeyEvent.VK_B: {
-			Main.beginRoundTwo();
-			System.out.println("IsDone set to true");
+			moveOn();
 		} break;
 		} // end of key listeners
-
-		// Begin doers
-		
-		// Handle teams buzzing in
-		if(teamSel != null && canAns == true && teamSel.hasGuessed() == false) {
-			GamePanel.displayText(ques, teamSel.getColor());
-			canAns = false;
-			teamAns = teamSel;
-		}
-		teamSel = null;
-		
-		// End if everyone has guessed wrong
-		if(wrong >= 4) {
-			GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
-			exit();
-		}
-		
-		// Print number to console
-		if(ch == true) {
-			ch = false;
-			System.out.println(num * numMult);
-		}
-		ch = false;
-		
-		// display correct screen
-		if(catSel != -1 && ptSel != -1 && canAns == false) {
-			ques = cat.get(catSel).getQuestion(ptSel).getQuestion();
-			GamePanel.displayText(ques);
-			cat.get(catSel).getQuestion(ptSel).setIsUsed(true);
-			npt = ptSel;
-			nct = catSel;
-			catSel = -1;
-			canAns = true;
-		}
-		ptSel = -1;
-		
-		// Print selected team to console
-		if(teamPrinted == true) {
-			System.out.println("team " + team);
-			teamPrinted = false;
-		}
 		
 		// TODO figure out how to do this properly
 		// Bodge to prevent f10 from creating errors
@@ -188,6 +156,57 @@ public class KeyListen {
 		} catch(NullPointerException ex) {
 			System.err.println("NullPointerException at KeyListen.java:144,145");
 		}
+		doer();
+	}
+	
+	private static void doer() {
+		// Begin doers
+		
+		// Handle teams buzzing in
+		if(teamSel != null && canAns == true && teamSel.hasGuessed() == false) {
+			GamePanel.displayText(ques, teamSel.getColor());
+			canAns = false;
+			teamAns = teamSel;
+			teamSel = null;
+		}
+		
+		
+		// End if everyone has guessed wrong
+		if(wrong >= 4) {
+			GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
+			mayLeave = 1;
+			exit();
+		}
+		
+		// Print number to console
+		if(ch == true) {
+			ch = false;
+			System.out.println(num * numMult);
+		}
+		ch = false;
+		
+		// display question screen
+		if(catSel != -1 && ptSel != -1 && hasSelCat == false) {
+			if(cat.get(catSel).getQuestion(ptSel).isUsed() == false) {
+				ques = cat.get(catSel).getQuestion(ptSel).getQuestion();
+				GamePanel.displayText(ques);
+				cat.get(catSel).getQuestion(ptSel).setIsUsed(true);
+				npt = ptSel;
+				nct = catSel;
+				catSel = -1;
+				canAns = true;
+				hasSelCat = true;
+			}
+		}
+		ptSel = -1;
+		
+		// Print selected team to console
+		if(teamPrinted == true) {
+			System.out.println("team " + team);
+			teamPrinted = false;
+		}
+		
+		
 	}
 	
 	public static void setQuestions(List<Category> c) {
@@ -215,7 +234,27 @@ public class KeyListen {
 			}
 		}
 		if(isDone == true) {
-			Main.beginRoundTwo();
+			moveOn();
 		}
+		hasSelCat = false;
 	}
+	
+	private static void moveOn() {
+		switch(round) {
+			case 1: {
+				Main.beginRoundTwo();
+				round = 2;
+			} break;
+			case 2: {
+				Main.beginRoundThree();
+				round = 3;
+				System.out.println("Round 3");
+			} break;
+			}
+	}
+	
+	public static void buzzRed() { teamSel = teamRed; doer(); }
+	public static void buzzYellow() { teamSel = teamYellow; doer(); }
+	public static void buzzGreen() { teamSel = teamGreen; doer(); }
+	public static void buzzBlue() { teamSel = teamBlue; doer(); }
 }
