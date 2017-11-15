@@ -36,7 +36,6 @@ public class Main{
 		});
 
 		GamePanel.displayText("Jeopardy");
-		GamePanel.displayText("This is a\nNew Line");
 	}
 	
 	public static void beginRoundOne() {
