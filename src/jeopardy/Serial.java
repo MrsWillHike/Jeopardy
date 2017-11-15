@@ -99,7 +99,6 @@ public class Serial implements SerialPortEventListener {
 		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 			try {
 				String inputLine = input.readLine();
-				System.out.println(inputLine + a++);
 				switch(inputLine) {
 				case "9": {KeyListen.buzzRed();} break;
 				case "a": {KeyListen.buzzYellow();} break;

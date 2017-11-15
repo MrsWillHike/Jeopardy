@@ -9,6 +9,7 @@ public class Team {
 	private static int count;
 	private int num;
 	private String name;
+	private int wager;
 	
 	public Team() {
 		score = 0;
@@ -64,5 +65,13 @@ public class Team {
 	
 	public int getNum() {
 		return num;
+	}
+	
+	public int getWager() {
+		return wager;
+	}
+	
+	public void setWager(int w) {
+		wager = w;
 	}
 }

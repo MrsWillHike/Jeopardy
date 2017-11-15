@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class KeyListen {
@@ -32,8 +33,9 @@ public class KeyListen {
 	private static Team teamBlue = new Team(Color.CYAN, "Blue");
 	private static Mode mode = Mode.RUN;
 	private static List<Category> cat;
+	private static List<Team> winners = new ArrayList<Team>();
 	private static Robot robot;
-	private static int round = 1;
+	private static int round = 0;
 	
 	public static void init() {
 		try {
@@ -89,20 +91,30 @@ public class KeyListen {
 		
 		// Handle correct or wrong answer
 		case KeyEvent.VK_BACK_SPACE: { // correct
-			if(teamAns != null) {
-				GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
-				teamAns.addScore(cat.get(nct).getQuestion(npt).getScore());
-				mayLeave = 1;
+			if(mode == Mode.FINAL_CORRECT) {
+				teamSel.addScore(teamSel.getWager());
+				finalSwitch();
+			} else {
+				if(teamAns != null) {
+					GamePanel.displayText(cat.get(nct).getQuestion(npt).getAnswer());
+					teamAns.addScore(cat.get(nct).getQuestion(npt).getScore());
+					mayLeave = 1;
+				}
 			}
 		} break;
 		case KeyEvent.VK_BACK_SLASH: { // wrong
-			if(teamAns != null && canAns == false) {
-				GamePanel.displayText(ques);
-				canAns = true;
-				teamAns.setGuessed(true);
-				teamAns.addScore(cat.get(nct).getQuestion(npt).getScore() * -1);
-				wrong++;
-				System.out.println(teamAns.getName() + " got it wrong " + wrong);
+			if(mode == Mode.FINAL_CORRECT) {
+				teamSel.addScore(teamSel.getWager() * -1);
+				finalSwitch();
+			} else {
+				if(teamAns != null && canAns == false) {
+					GamePanel.displayText(ques);
+					canAns = true;
+					teamAns.setGuessed(true);
+					teamAns.addScore(cat.get(nct).getQuestion(npt).getScore() * -1);
+					wrong++;
+					System.out.println(teamAns.getName() + " got it wrong " + wrong);
+				}
 			}
 		} break;
 		
@@ -126,16 +138,50 @@ public class KeyListen {
 			if(e.getKeyLocation() == 4) {
 				switch(mode) {
 				case RUN: {} break;
-				case SCORE_ADD: teamMod.addScore(num * numMult); break;
-				case SCORE_SET: teamMod.setScore(num * numMult); break;
+				case SCORE_ADD: teamMod.addScore(num * numMult); GamePanel.drawMainPanel(cat); break;
+				case SCORE_SET: teamMod.setScore(num * numMult); GamePanel.drawMainPanel(cat); break;
+				case WAGER: {
+					teamSel.setWager(num * numMult);
+					switch(teamSel.getName()) {
+					case "Red": { teamSel = teamYellow; } break;
+					case "Yellow": { teamSel = teamGreen; } break;
+					case "Green": { teamSel = teamBlue; } break;
+					case "Blue": { System.out.println(GamePanel.displayText(cat.get(0).getQuestion(0).getQuestion() + "")); mode = Mode.FINAL_JEOPARDY; System.out.println("Blue Team");} break;
+					}
+					num = 0;
+					numMult = 1;
+					if(mode != Mode.FINAL_JEOPARDY) {
+						GamePanel.displayText(teamSel.getName() + " Team\n");
+					}
+				} break;
 				default: {} break;
 				}
-				GamePanel.drawMainPanel(cat);
+				
 			} else if(e.getKeyLocation() == 1) {
-				if(mayLeave == 1) {
-					GamePanel.drawMainPanel(cat);
-					exit();
-					mayLeave = 0;
+				if(mode == Mode.RUN) {
+					switch(round) {
+					case 0: {
+						moveOn();
+					} break;
+					case 3: {
+						mode = Mode.WAGER;
+						teamSel = teamRed;
+						GamePanel.displayText(teamSel.getName() + " Team\n");
+					} break;
+					default: {
+						if(mayLeave == 1) {
+							GamePanel.drawMainPanel(cat);
+							exit();
+							mayLeave = 0;
+						}
+					} break;
+					}
+				} else {
+					if(mode == Mode.FINAL_JEOPARDY) {
+						mode = Mode.FINAL_CORRECT;
+						teamSel = teamRed;
+						GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
+					}
 				}
 			}
 		} break;
@@ -146,21 +192,86 @@ public class KeyListen {
 		
 		// TODO figure out how to do this properly
 		// Bodge to prevent f10 from creating errors
-		// Probibly need will be eliminated when i use F13-16
+		// Will be removed with the F9-12 buzzing
 		// Presses and releases F10 to undo whatever F10 does
+		if(e.getKeyCode() == KeyEvent.VK_F10) {
 		try {
-			if(e.getKeyCode() == KeyEvent.VK_F10) {
 				robot.keyPress(KeyEvent.VK_F10);
+				robot.delay(1);
 				robot.keyRelease(KeyEvent.VK_F10);
+			
+			} catch(NullPointerException ex) {
+				ex.printStackTrace();
 			}
-		} catch(NullPointerException ex) {
-			System.err.println("NullPointerException at KeyListen.java:144,145");
 		}
 		doer();
 	}
 	
+	private static void finalSwitch() {
+		switch(teamSel.getName()) {
+		case "Red": { teamSel = teamYellow; } break;
+		case "Yellow": { teamSel = teamGreen; } break;
+		case "Green": { teamSel = teamBlue; } break;
+		case "Blue": { mode = Mode.RESULTS; } break;
+		}
+		if(mode != Mode.RESULTS) {
+			GamePanel.displayText(cat.get(0).getQuestion(0).getAnswer(), teamSel.getColor());
+		} else {
+			if(teamRed.getScore() > teamYellow.getScore()) {
+				teamSel = teamRed;
+			} else {
+				teamSel = teamYellow;
+			}
+			if(teamSel.getScore() < teamGreen.getScore()) {
+				teamSel = teamGreen;
+			}
+			if(teamSel.getScore() < teamBlue.getScore()) {
+				teamSel = teamBlue;
+			}
+			if(teamRed.getScore() == teamSel.getScore()) {
+				winners.add(teamRed);
+			}
+			if(teamYellow.getScore() == teamSel.getScore()) {
+				winners.add(teamYellow);
+			}
+			if(teamGreen.getScore() == teamSel.getScore()) {
+				winners.add(teamGreen);
+			}
+			if(teamBlue.getScore() == teamSel.getScore()) {
+				winners.add(teamBlue);
+			}
+			if(winners.size() == 1) {
+				GamePanel.displayText("And the winner is:\n" + teamSel.getName(), teamSel.getColor());
+			} else {
+				String out = "";
+				int red = 0;
+				int green = 0;
+				int blue = 0;
+				for(int i = 0; i < winners.size(); i++) { 
+					if(i != 0) {
+						out = out + ", ";
+					}
+					out = out + winners.get(i).getName();
+					red = red + winners.get(i).getColor().getRed();
+					green = green + winners.get(i).getColor().getGreen();
+					blue = blue + winners.get(i).getColor().getBlue();
+				}
+				red = red / winners.size();
+				green = green / winners.size();
+				blue = blue / winners.size();
+				GamePanel.displayText("And the winner is:\n" + out, new Color(0xfe, 0x67, 0x00));
+			}
+		}
+	}
+	
 	private static void doer() {
 		// Begin doers
+		
+		// Show color if round is 0
+		if(round == 0 && teamSel != null) {
+			GamePanel.displayText("Jeopardy", teamSel.getColor());
+			teamSel = null;
+		}
 		
 		// Handle teams buzzing in
 		if(teamSel != null && canAns == true && teamSel.hasGuessed() == false) {
@@ -169,7 +280,6 @@ public class KeyListen {
 			teamAns = teamSel;
 			teamSel = null;
 		}
-		
 		
 		// End if everyone has guessed wrong
 		if(wrong >= 4) {
@@ -181,7 +291,11 @@ public class KeyListen {
 		// Print number to console
 		if(ch == true) {
 			ch = false;
-			System.out.println(num * numMult);
+			int numb = num * numMult;
+			System.out.println(numb);
+			if(mode == Mode.WAGER) {
+				GamePanel.displayText(teamSel.getName() + " Team\n" + numb);
+			}
 		}
 		ch = false;
 		
@@ -226,7 +340,13 @@ public class KeyListen {
 		ques = null;
 		wrong = 0;
 		canAns = false;
-		isDone = true;
+		hasSelCat = false;
+	}
+	
+	private static void exit(boolean noCheck) {
+		exit();
+		if(noCheck == false) {
+			isDone = true;
 		for(int i = 0; i < cat.size(); i++) {
 			if(cat.get(i).isDone() == false) {
 				isDone = false;
@@ -236,21 +356,33 @@ public class KeyListen {
 		if(isDone == true) {
 			moveOn();
 		}
-		hasSelCat = false;
+		}
 	}
 	
 	private static void moveOn() {
+		isDone = false;
 		switch(round) {
-			case 1: {
-				Main.beginRoundTwo();
-				round = 2;
-			} break;
-			case 2: {
-				Main.beginRoundThree();
-				round = 3;
-				System.out.println("Round 3");
-			} break;
-			}
+		case 0: {
+			canAns = false;
+			Main.beginRoundOne();
+			round = 1;
+			exit(true);
+		} break;
+		case 1: {
+			Main.beginRoundTwo();
+			round = 2;
+			exit(true);
+		} break;
+		case 2: {
+			Main.beginRoundThree();
+			round = 3;
+			exit(true);
+		} break;
+		}
+	}
+	
+	public static void canAns(boolean c) {
+		canAns = c;
 	}
 	
 	public static void buzzRed() { teamSel = teamRed; doer(); }

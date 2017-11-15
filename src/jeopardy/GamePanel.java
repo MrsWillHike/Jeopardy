@@ -124,14 +124,27 @@ public class GamePanel{
                 int sh;
                 int x;
                 int y;
-                if(sw > (double)getWidth() * (9d/10d)) {
+                String textA = "";
+                String textB = "";
+                boolean twoLine = false;
+                if(text.contains("\n")) {
+                	int loc = 0;
+                	while(text.charAt(loc) != '\n') {
+                		loc++;
+                	}
+                	textA = text.substring(0,  loc++);
+                	textB = text.substring(loc, text.length());
+                	twoLine = true;
+                }
+                if(sw > (double) getWidth() * (9d/10d)) {
                 	int loc = text.length() / 2;
                 	while(text.charAt(loc) != ' ') {
                 		loc++;
                 	}
-                	String textA = text.substring(0,  loc++);
-                	String textB = text.substring(loc, text.length());
-                	
+                	textA = text.substring(0,  loc++);
+                	textB = text.substring(loc, text.length());
+                }
+                if(twoLine == true) {
                 	sh = g.getFontMetrics().getHeight();
                 	
                 	sw = g.getFontMetrics().stringWidth(textA);
